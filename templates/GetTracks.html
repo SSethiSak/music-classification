@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <header> Get tracks from user </header>
+    <body>
+        <table>
+        <tbody>
+        {%for i in range(songs_name|length)%}
+            <tr>
+            <td> {{songs_name[i]}} </td>
+            <td> {{artist[i]}}</td>
+            
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </body>
+</html>
