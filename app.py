@@ -113,6 +113,13 @@ def getTracks():
 
 @app.route('/getplaylist', methods = ["GET", "POST"])
 def getplaylist():
+    try:
+        token_info = helper.get_user_token(TOKEN_INFO)
+    except:
+        print("user not logged in")
+        redirect(url_for("login", _external = False))
+        
+    sp = spotipy.Spotify(auth=token_info['access_token'])
     link = request.form.get("link")
         # Split the URL by '/'
     url_parts = link.split('/')
@@ -125,19 +132,26 @@ def getplaylist():
     sp = spotipy.Spotify(auth=token_info['access_token'])
     
     playlist = sp.playlist(playlist_id)
-    
+    print(playlist['name'])
+    playlist_name = playlist['name']
+    playlist = playlist['tracks']
     tracks = helper.get_track_name(playlist)
     artist = helper.get_track_artist(playlist)
     id = helper.get_track_id(playlist)
     feature = sp.audio_features(id[0])
   
-    songs,artists,Length, Danceability, Acousticness, Energy, Instrumentalness, Liveness, Valence, Loudness, Speechiness, Tempo = ([] for i in range(12))
-    
-    for i in range(len(tracks)):
-        songs.append(tracks[i])
-        artists.append(artist[i])
-        test_feature = sp.audio_features(id[i])
-        Length.append((int(test_feature[0]['duration_ms']) / 1000)/60)
+    songs,artists,Length, Danceability, Acousticness, Energy, Instrumentalness, Liveness, Valence, Loudness, Speechiness, Tempo, Happy, Sad, Energetic, Calm, mood, emotion= ([] for i in range(18))
+    Valence_weight = 1
+    Energy_weight = 0.6
+    Danceability_weight = 0.4
+    for track in playlist['items']:
+        # Extract track information
+        track_info = track['track']
+        songs.append(track_info['name'])
+        artists.append(track_info['artists'][0]['name'])
+        print(track_info['name'])
+        test_feature = sp.audio_features(track_info['id'])
+        Length.append((int(test_feature[0]['duration_ms']) / 1000) / 60)
         Danceability.append(test_feature[0]['danceability'])
         Acousticness.append(test_feature[0]['acousticness'])
         Energy.append(test_feature[0]['energy'])
@@ -147,7 +161,28 @@ def getplaylist():
         Loudness.append(test_feature[0]['loudness'])
         Speechiness.append(test_feature[0]['speechiness'])
         Tempo.append(test_feature[0]['tempo'])
-    while playlist['tracks']['next']:
+        
+        valence_value = test_feature[0]['valence']
+        energy_value = test_feature[0]['energy']
+        danceability_value = test_feature[0]['danceability']
+        happy_value = (Valence_weight * valence_value) + (Energy_weight * energy_value)
+        sad_value = (Valence_weight * (1 - valence_value)) + (Energy_weight * (1 - energy_value))
+        calm_value = (Danceability_weight * (1 - danceability_value)) + (Energy_weight * energy_value)
+        energetic_value = (Danceability_weight * danceability_value) + (Energy_weight * energy_value)
+        Happy.append(happy_value)
+        Sad.append(sad_value)
+        Calm.append(calm_value)
+        Energetic.append(energetic_value)
+        if happy_value > sad_value:
+            mood.append("Happy")
+        else:
+            mood.append("Sad")
+        if energetic_value > calm_value:
+            emotion.append("Energetic")
+        else:
+                emotion.append("Calm")
+    
+    while playlist['next']:
         playlist = sp.next(playlist['tracks'])    
         tracks = helper.get_track_name(playlist)
         artist = helper.get_track_artist(playlist)
@@ -167,10 +202,31 @@ def getplaylist():
             Loudness.append(test_feature[0]['loudness'])
             Speechiness.append(test_feature[0]['speechiness'])
             Tempo.append(test_feature[0]['tempo'])
+            
+            valence_value = test_feature[0]['valence']
+            energy_value = test_feature[0]['energy']
+            danceability_value = test_feature[0]['danceability']
+            happy_value = (Valence_weight * valence_value) + (Energy_weight * energy_value)
+            sad_value = (Valence_weight * (1 - valence_value)) + (Energy_weight * (1 - energy_value))
+            calm_value = (Danceability_weight * (1 - danceability_value)) + (Energy_weight * energy_value)
+            energetic_value = (Danceability_weight * danceability_value) + (Energy_weight * energy_value)
+            Happy.append(happy_value)
+            Sad.append(sad_value)
+            Calm.append(calm_value)
+            Energetic.append(energetic_value)
+            if happy_value > sad_value:
+                mood.append("Happy")
+            else:
+                mood.append("Sad")
+            if energetic_value > calm_value:
+                emotion.append("Energetic")
+            else:
+                emotion.append("Calm")
     data = {
         'Song Name': songs,
         'Artist': artists,
         'Length': Length,
+        
         'Danceability':Danceability,
         'Acousticness':Acousticness,
         'Energy':Energy,
@@ -179,13 +235,20 @@ def getplaylist():
         'Valence':Valence,
         'Loudness':Loudness,
         'Speechiness':Speechiness,
-        'Tempo':Tempo
+        'Tempo':Tempo,
+        'Happy' :Happy,
+        'Sad' :Sad,
+        'Energetic' :Energetic,
+        'Calm' :Calm,
+        'Mood' : mood,
+        'Emotion' :emotion
     }
     # Create a DataFrame from the data dictionary
     df = pd.DataFrame(data)
     
+
     # Export DataFrame to a CSV file
-    df.to_excel('tracks.xlsx', index=False)
+    df.to_excel('placehold.xlsx', index=False)
     return render_template("index.html")
 
 
