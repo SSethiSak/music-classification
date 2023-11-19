@@ -95,10 +95,11 @@ def getTracks():
                 energy_value = test_feature[feature]['energy']
                 danceability_value = test_feature[feature]['danceability']
                 
-                happy_value = (Valence_weight * valence_value) + (Energy_weight * energy_value)
-                sad_value = (Valence_weight * (1 - valence_value)) + (Energy_weight * (1 - energy_value))
-                calm_value = (Danceability_weight * (1 - danceability_value)) + (Energy_weight * energy_value)
-                energetic_value = (Danceability_weight * danceability_value) + (Energy_weight * energy_value)
+                happy_value = helper.get_happy_value(valence_value,energy_value)
+                sad_value = helper.get_sad_value(valence_value,energy_value)
+                calm_value = helper.get_calm_value(danceability_value, energetic_value)
+                energetic_value = helper.get_energetic_value(danceability_value, energetic_value)
+                
                 Happy.append(happy_value)
                 Sad.append(sad_value)
                 Calm.append(calm_value)
@@ -192,9 +193,7 @@ def getplaylist():
     feature = sp.audio_features(id[0])
   
     songs,artists,Length, Danceability, Acousticness, Energy, Instrumentalness, Liveness, Valence, Loudness, Speechiness, Tempo, Happy, Sad, Energetic, Calm, mood, emotion= ([] for i in range(18))
-    Valence_weight = 1
-    Energy_weight = 0.6
-    Danceability_weight = 0.4
+
     for track in playlist['items']:
         # Extract track information
         track_info = track['track']
@@ -216,14 +215,19 @@ def getplaylist():
         valence_value = test_feature[0]['valence']
         energy_value = test_feature[0]['energy']
         danceability_value = test_feature[0]['danceability']
-        happy_value = (Valence_weight * valence_value) + (Energy_weight * energy_value)
-        sad_value = (Valence_weight * (1 - valence_value)) + (Energy_weight * (1 - energy_value))
-        calm_value = (Danceability_weight * (1 - danceability_value)) + (Energy_weight * energy_value)
-        energetic_value = (Danceability_weight * danceability_value) + (Energy_weight * energy_value)
+        instrumentalness_value = test_feature[0]['instrumentalness']
+        
+        happy_value = helper.get_happy_value(valence_value, energy_value, danceability_value)
+        sad_value = helper.get_sad_value(valence_value, energy_value, danceability_value)
+        calm_value = helper.get_calm_value(danceability_value, energy_value, valence_value, instrumentalness_value)
+        energetic_value = helper.get_energetic_value(danceability_value, energy_value, valence_value, instrumentalness_value)
+            
+            
         Happy.append(happy_value)
         Sad.append(sad_value)
         Calm.append(calm_value)
         Energetic.append(energetic_value)
+        
         if happy_value > sad_value:
             mood.append("Happy")
         else:
@@ -257,10 +261,14 @@ def getplaylist():
             valence_value = test_feature[0]['valence']
             energy_value = test_feature[0]['energy']
             danceability_value = test_feature[0]['danceability']
-            happy_value = (Valence_weight * valence_value) + (Energy_weight * energy_value)
-            sad_value = (Valence_weight * (1 - valence_value)) + (Energy_weight * (1 - energy_value))
-            calm_value = (Danceability_weight * (1 - danceability_value)) + (Energy_weight * energy_value)
-            energetic_value = (Danceability_weight * danceability_value) + (Energy_weight * energy_value)
+            instrumentalness_value = test_feature[0]['instrumentalness']
+            happy_value = helper.get_happy_value(valence_value, energy_value, danceability_value)
+            sad_value = helper.get_sad_value(valence_value, energy_value, danceability_value)
+            calm_value = helper.get_calm_value(danceability_value, energy_value, valence_value, instrumentalness_value)
+            energetic_value = helper.get_energetic_value(danceability_value, energy_value, valence_value, instrumentalness_value)
+            
+            
+            
             Happy.append(happy_value)
             Sad.append(sad_value)
             Calm.append(calm_value)
@@ -270,13 +278,14 @@ def getplaylist():
                 
             else:
                 mood.append("Sad")
-               
+                
+                
             if energetic_value > calm_value:
                 emotion.append("Energetic")
-                
+             
             else:
                 emotion.append("Calm")
-                
+            
     happycount, sadcount,calmcount,energetic_count = 0,0,0,0
     for i in mood:
         if i == "Happy":
@@ -323,13 +332,13 @@ def getplaylist():
         'Mood' : mood,
         'Emotion' :emotion
     }
-    # Create a DataFrame from the data dictionary
-    #df = pd.DataFrame(data)
+    # #Create a DataFrame from the data dictionary
+    # df = pd.DataFrame(data)
     
 
-    # Export DataFrame to a CSV file
-    #df.to_excel('fu.xlsx', index=False)
-    print(link)
+    # #Export DataFrame to a CSV file
+    # df.to_excel('sample.xlsx', index=False)
+    
     return render_template("dashboardjs.html", spotify_link = link, mood_result = mood_result, mood_percentage = mood_percentage, emotion_result = emotion_result, emotion_percentage = emotion_percentage, Name = songs, artist = artists, mood = mood, emotion = emotion, happy = Happy, sad = Sad, energetic = Energetic, calm = Calm,
                            length = Length, danceability = Danceability, acousticness = Acousticness, energy = Energy, instrumentalness = Instrumentalness,
                            liveness = Liveness, valence = Valence, loudness = Loudness, speechiness = Speechiness,tempo = Tempo)
@@ -376,27 +385,33 @@ def gettrack():
     Speechiness = (track_feature[0]['speechiness'])
     Tempo = (track_feature[0]['tempo'])
     
-    happy_value = (Valence_weight * Valence) + (Energy_weight * Energy)
-    sad_value = (Valence_weight * (1 - Valence)) + (Energy_weight * (1 - Energy))
-    calm_value = (Danceability_weight * (1 - Danceability)) + (Energy_weight * Energy)
-    energetic_value = (Danceability_weight * Danceability) + (Energy_weight * Energy)
+    happy_value = helper.get_happy_value(Valence, Energy, Danceability)
+    sad_value = helper.get_sad_value(Valence,Energy, Danceability)
+    calm_value = helper.get_calm_value(Danceability, Energy, Valence, Instrumentalness)
+    energetic_value = helper.get_energetic_value(Danceability, Energy, Valence, Instrumentalness)
     
-    mood_value_normalizer = 100/ (happy_value + sad_value)
-    emotion_value_normalizer = 100 / (calm_value + energetic_value)
+    mood_value_normalizer = 1/ (happy_value + sad_value)
+    emotion_value_normalizer = 1 / (calm_value + energetic_value)
+    
+    happy_value = mood_value_normalizer * happy_value
+    sad_value = mood_value_normalizer * sad_value
+    calm_value = emotion_value_normalizer * calm_value
+    energetic_value = emotion_value_normalizer * energetic_value
     
     if happy_value > sad_value:
         mood_result = "Happy"
-        mood_percentage = mood_value_normalizer * happy_value
+        mood_percentage = 100 * happy_value
     else:
         mood_result = "Sad"
-        mood_percentage = mood_value_normalizer * sad_value
+        mood_percentage = 100 * sad_value
     
     if calm_value > energetic_value:
         emotion_result = "Calm"
-        emotion_percentage = emotion_value_normalizer * calm_value
+        emotion_percentage =  100 * calm_value
+        
     else:
         emotion_result = "Energetic"
-        emotion_percentage = emotion_value_normalizer * energetic_value
+        emotion_percentage = 100 * energetic_value
     
     return render_template("trackdashboard.html", mood_result = mood_result, mood_percentage = mood_percentage, emotion_result = emotion_result, emotion_percentage = emotion_percentage, Name = track_name, artist = track_artist, mood = mood_result, emotion = emotion_result, happy = happy_value, sad = sad_value, energetic = energetic_value, calm = calm_value,
                            length = Length, danceability = Danceability, acousticness = Acousticness, energy = Energy, instrumentalness = Instrumentalness,
