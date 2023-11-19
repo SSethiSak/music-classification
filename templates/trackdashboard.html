@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    admin
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-6 mx-auto">
+                <div class="embed-responsive embed-responsive-16by9 mb-4">
+                    <h1> {{Name}}<h1>
+                </div>
+                <div class="card text-center">
+                    <div class="card-header">
+                        <h5 class="card-title" >Mood and Emotion Classification</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6 class="card-subtitle mb-2 text-muted">Mood: {{ mood_result }}</h6>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ mood_percentage }}%;" aria-valuenow="{{ mood_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="card-text">{{ '%.2f'|format(mood_percentage) }}% likely to be {{mood_result}}</p>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Emotion: {{ emotion_result }}</h6>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ emotion_percentage }}%;" aria-valuenow="{{ emotion_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="card-text">{{ '%.2f'|format(emotion_percentage) }}% likely to be {{emotion_result}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="table-container" style="display: none;">
+                    <table class="table table-striped mt-4">
+                        <thead>
+                            <tr>
+                                <th>Link </th>
+                                <th scope="col">Song Name</th>
+                                <th scope="col">Artist</th>
+                                <th scope="col">Mood</th>
+                                <th scope="col">Emotion</th>
+                                <th scope="col">Length</th>
+                                <th scope="col">Danceability</th>
+                                <th scope="col">Acousticness</th>
+                                <th scope="col">Energy</th>
+                                <th scope="col">Instrumentalness</th>
+                                <th scope="col">Liveness</th>
+                                <th scope="col">Valence</th>
+                                <th scope="col">Loudness</th>
+                                <th scope="col">Speechiness</th>
+                                <th scope="col">Tempo</th>
+                                
+                                
+                                <th scope="col">Happy Value</th>
+                                <th scope="col">Sad Value</th>
+                                <th scope="col">Energetic Value</th>
+                                <th scope="col">Calm Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                                <tr>
+                                    <td>{{spotify_link}}
+                                    <td>{{ Name }}</td>
+                                    <td>{{ artist}}</td>
+                                    <td>{{ mood}}</td>
+                                    <td>{{ emotion}}</td>
+                                    <td>{{'%.2f' %length}}</th>
+                                    <td>{{'%.2f' %danceability}}</th>
+                                    <td>{{'%.2f' %acousticness}}</th>
+                                    <td>{{'%.2f' %energy}}</th>
+                                    <td>{{'%.2f' %instrumentalness}}</th>
+                                    <td>{{'%.2f' %liveness}}</th>
+                                    <td>{{'%.2f' %valence}}</th>
+                                    <td>{{'%.2f' %loudness}}</th>
+                                    <td>{{'%.2f' %speechiness}}</th>
+                                    <td >{{'%.2f' %tempo}}</th>
+                                    <td>{{ '%.2f' % happy}}</td>
+                                    <td>{{ '%.2f' % sad}}</td>
+                                    <td>{{ '%.2f' % energetic}}</td>
+                                    <td>{{ '%.2f' % calm}}</td>
+                                </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+                <button id="show-more-btn" class="btn btn-primary mt-4">Show More</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("show-more-btn").addEventListener("click", function() {
+            var tableContainer = document.getElementById("table-container");
+            if (tableContainer.style.display === "none") {
+                tableContainer.style.display = "block";
+                this.textContent = "Show Less";
+            } else {
+                tableContainer.style.display = "none";
+                this.textContent = "Show More";
+            }
+        });
+    </script>
+{% endblock %}

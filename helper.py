@@ -93,12 +93,12 @@ def get_user_token(TOKEN_INFO):
         sp_oauth.refresh_access_token(token_info['refresh_token'])
     return token_info
 
-def get_track_name(playlist):
+def get_playlist_track_name(playlist):
     tracks = []
     for i in range(len(playlist)):
         tracks.append(playlist['items'][i]['track']['name'])
     return tracks
-def get_track_artist(playlist):
+def get_playlist_track_artist(playlist):
     artist = []
     for i in range(len(playlist)):
         artistarray = (playlist['items'][i]['track']['artists'])
