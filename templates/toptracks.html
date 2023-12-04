@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    admin
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            
+            <div class="card text-center">
+                <div class="card-header">
+                    <h5 class="card-title" >Music Classification</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="card-subtitle mb-2 text-muted">Genre: {{ genre_result }}</h6>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ genre_percentage }}%;" aria-valuenow="{{ mood_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="card-text">{{ '%.2f'|format(genre_percentage) }}% Certainty</p>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="card text-center">
+                <div class="card-header">
+                    <h5 class="card-title">Mood and Emotion Classification</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="card-subtitle mb-2 text-muted">Mood: {{ mood_result }}</h6>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ mood_percentage }}%;" aria-valuenow="{{ mood_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="card-text">{{ '%.2f'|format(mood_percentage) }}% of songs have this mood</p>
+                    </div>
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Emotion: {{ emotion_result }}</h6>
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ emotion_percentage }}%;" aria-valuenow="{{ emotion_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="card-text">{{ '%.2f'|format(emotion_percentage) }}% of songs have this emotion</p>
+                    </div>
+                </div>
+            </div>
+<tbody>
+    {% for i in range(songs|length) %}
+    <td>
+        {{i+1}}
+        <div class="embed-responsive embed-responsive-16by9 mb-4">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/{{link[i]}}?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+    </td>
+    {% endfor %}
+</tbody>
+
+
+
+
+{% endblock %}

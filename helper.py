@@ -14,76 +14,19 @@ client_secret = os.getenv("CLIENT_SECRET")
 Valence_weight = 1
 Energy_weight = 0.6
 Danceability_weight = 0.4
-    
-def get_token():
-    auth_string = client_id + ":" + client_secret
-    auth_bytes = auth_string.encode("utf-8")
-    auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
-    
-    url = "https://accounts.spotify.com/api/token"
-    headers = {
-        "Authorization": "basic " + auth_base64,
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    data = {"grant_type": "client_credentials"}
-    result = post(url, headers=headers, data=data)
-    json_result = json.loads(result.content)
-    token = json_result["access_token"]
-    return token
 
 def get_auth_header(token):
     return {"Authorization": "Bearer " + token}
 
-def search_for_artist(token, artist_name):
-    url = "https://api.spotify.com/v1/search"
-    headers = get_auth_header(token)
-    
-    query = f"?q={artist_name}&type=artist&limit=1"
-    
-    query_url = url + query
-    result = get(query_url, headers=headers)
-    json_result = json.loads(result.content)["artists"]["items"]
-    if len(json_result) == 0:
-        print("no artist with this name")
-        return None
-    return json_result[0]
-
-def get_songs_by_artist(token, artist_id):
-    url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks?country=US"
-    headers = get_auth_header(token)
-    result = get(url, headers=headers)
-    json_result = json.loads(result.content)["tracks"]
-    return json_result
 
 
-def get_user_playlist(token, user_id):
-    url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
-    headers = get_auth_header(token)
-    result = get(url, headers=headers)
-    json_result = json.loads(result.content)
-    return json_result
-
-
-# def get_user_id(token):
-#     url = f"https://api.spotify.com/v1/me"
-#     headers = get_auth_header(token)
-#     result = get(url, headers)
-#     json_result = json.loads(result.content)
-#     return json_result
-
-def get_playlist(token, playlist_id):
-    url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
-    headers = get_auth_header(token)
-    result = get(url, headers=headers)
-    json_result = json.loads(result.content)['tracks']['items']
-    return json_result
-
+#helper functions
 
 def create_spotify_oauth():
     return SpotifyOAuth(client_id= client_id,
                         client_secret=client_secret,
                         redirect_uri= url_for("redirectpage", _external=True),
-                        scope="user-library-read"
+                        scope="user-library-read user-top-read"
                         )
 
 def get_user_token(TOKEN_INFO):
@@ -102,6 +45,8 @@ def get_playlist_track_name(playlist):
     for i in range(len(playlist)):
         tracks.append(playlist['items'][i]['track']['name'])
     return tracks
+
+
 def get_playlist_track_artist(playlist):
     artist = []
     for i in range(len(playlist)):
@@ -117,6 +62,10 @@ def get_track_id(playlist):
         id.append(playlist['items'][i]['track']['id'])
     return id
 
+
+
+
+#mood calculation
 def get_happy_value(valence_value, energy_value):
     Valence_weight = 0.7
     Energy_weight = 0.3
@@ -190,20 +139,3 @@ def get_energetic_value(danceability_value, energy_value, valence_value, instrum
             
     return energetic_value
 
-token = get_token()
-
-# result =search_for_artist(token, "yoasobi")
-# artist_id = result["id"]    
-
-# songs = get_songs_by_artist(token,artist_id)
-
-# for idx, song in enumerate(songs):
-#     print(f"{idx + 1}. {song['name']} | {song['popularity']}")
-    
-
-#user_playlist = get_user_playlist(token, user_id)
-# playlist_id = "0vlFkVxN2LIthqUeQQYbSj?si=784d9b5ae0e04a32"
-# playlist = get_playlist(token, playlist_id)
-
-# for idx,song in enumerate(playlist):
-#     print(f"{idx + 1}. {song['track']['name']}")

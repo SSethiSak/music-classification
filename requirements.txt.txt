@@ -1,0 +1,11 @@
+flask
+time
+pandas
+spotipy
+csv
+spotipy.oauth2
+base64
+dotenv
+os
+json
+requests

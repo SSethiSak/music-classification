@@ -62,6 +62,53 @@
             
         </form>
     </div>
-    <iframe src="https://open.spotify.com/embed/playlist/0vlFkVxN2LIthqUeQQYbSj" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+    <div class="center">
+        <h2 class="heading"> Liked playlist Classification</h2>
+        <form method="post">
+            <div class="mb-3">
+               <button class="btn btn-primary" formaction="/get_user_track" type="submit"> Classify</button>
+            </div>
+        </form>
+    </div>
+    <div class="center">
+        <h2 class="heading"> User Top tracks</h2>
+        <form method="post">
+            <div>
+                 <button class="btn btn-primary" formaction="/toptracks" type ="submit"> Get top 20 tracks </button>
+            </div>
+            <div>
+                <input type="radio" id="last4weeks" name="time_range" value="short_term" checked>
+                <label for="last4weeks">Last 4 weeks</label>
+            </div>
+            <div>
+                <input type="radio" id="last6months" name="time_range" value="medium_term">
+                <label for="last6months">Last 6 months</label>
+            </div>
+            <div>
+                <input type="radio" id="alltime" name="time_range" value="long_term">
+                <label for="alltime">All time</label>
+            </div>
+        </form>
+    </div>
+    <div class="center">
+        <h2 class="heading">User Top Artist</h2>
+        <form method="post">
+            <div>
+                <button class="btn btn-primary" formaction="/topartists" type="submit">Get top 20 artists</button>
+            </div>
+            <div>
+                <input type="radio" id="last4weeks" name="time_range" value="short_term" checked>
+                <label for="last4weeks">Last 4 weeks</label>
+            </div>
+            <div>
+                <input type="radio" id="last6months" name="time_range" value="medium_term">
+                <label for="last6months">Last 6 months</label>
+            </div>
+            <div>
+                <input type="radio" id="alltime" name="time_range" value="long_term">
+                <label for="alltime">All time</label>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
